@@ -1,5 +1,6 @@
 package com.sdssd.app.security
 
+import com.sdssd.app.service.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -7,21 +8,18 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer
-import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer
 import org.springframework.security.oauth2.provider.token.TokenStore
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore
-import org.springframework.web.cors.CorsConfiguration
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-import org.springframework.web.filter.CorsFilter
 
 @Configuration
 @EnableAuthorizationServer
-class AuthorizationServerConfig(val authenticationManager: AuthenticationManager, val accessTokenConverter: JwtAccessTokenConverter) : AuthorizationServerConfigurerAdapter() {
+class AuthorizationServerConfig(val authenticationManager: AuthenticationManager, val userService: UserService,
+                                val accessTokenConverter: JwtAccessTokenConverter) : AuthorizationServerConfigurerAdapter() {
 
 
     val CLIEN_ID = "walletapp"
-    val CLIENT_SECRET = "walletpassword"
+    val CLIENT_SECRET = "\$2y\$12\$JPJLzIQa/XvnWlA2TpA2LOI44auBnYNHRzyWqPoVrSdzK9fOdoqsy"
     val GRANT_TYPE_PASSWORD = "password"
     val AUTHORIZATION_CODE = "authorization_code"
     val REFRESH_TOKEN = "refresh_token"
@@ -51,7 +49,12 @@ class AuthorizationServerConfig(val authenticationManager: AuthenticationManager
     }
 
 
-
-
+    override fun configure(endpoints: AuthorizationServerEndpointsConfigurer) {
+        endpoints
+                .tokenStore(tokenStore())
+                .accessTokenConverter(accessTokenConverter)
+                .authenticationManager(authenticationManager)
+                .userDetailsService(userService)
+    }
 
 }

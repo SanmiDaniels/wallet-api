@@ -1,8 +1,11 @@
 package com.sdssd.app.security
 
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer
@@ -18,11 +21,16 @@ class ResourceServerConfig : ResourceServerConfigurerAdapter() {
     private val PERMIT_ALL_GET_REQUEST = arrayOf<String>("/user")
     private val PERMIT_ALL_REQUEST = arrayOf<String>("/user")
     private val PERMIT_ALL_POST_REQUEST = arrayOf<String>("/test")
-    private val PERMIT_NOOB_GET_REQUEST = arrayOf<String>("/test")
-    private val PERMIT_NOOB_POST_REQUEST = arrayOf<String>("/test")
-    private val PERMIT_ELITE_GET_REQUEST = arrayOf<String>("/test")
-    private val PERMIT_ELITE_POST_REQUEST = arrayOf<String>("/test")
-    private val PERMIT_ADMIN_REQUEST = arrayOf<String>("/test")
+    private val PERMIT_NOOB_GET_REQUEST = arrayOf<String>("/user/test")
+    private val PERMIT_NOOB_POST_REQUEST = arrayOf<String>("/user/test")
+    private val PERMIT_ELITE_GET_REQUEST = arrayOf<String>("/user/test")
+    private val PERMIT_ELITE_POST_REQUEST = arrayOf<String>("/user/test")
+    private val PERMIT_ADMIN_REQUEST = arrayOf<String>("/user/test")
+
+    @Bean
+    fun encoder(): PasswordEncoder {
+        return BCryptPasswordEncoder();
+    }
 
     override fun configure(resources: ResourceServerSecurityConfigurer) {
         resources.resourceId("resource_id").stateless(false)

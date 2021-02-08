@@ -3,6 +3,7 @@ package com.sdssd.app.service
 import com.sdssd.app.dto.UserDto
 import com.sdssd.app.model.User
 import com.sdssd.app.repository.UserRepository
+import com.sdssd.app.repository.WalletRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -13,7 +14,8 @@ import java.util.*
 
 
 @Service
-class UserService(val userRepo: UserRepository, val passwordEncoder: PasswordEncoder) : UserDetailsService {
+class UserService(val userRepo: UserRepository, val walletRepository: WalletRepository,
+                  val passwordEncoder: PasswordEncoder) : UserDetailsService {
 
 
     fun createUser(newUser: UserDto) : Boolean{
@@ -24,6 +26,13 @@ class UserService(val userRepo: UserRepository, val passwordEncoder: PasswordEnc
             return true
         }
     }
+
+
+    fun canAddWallet(email: String): Boolean{
+
+        return !(userRepo.findById(email).get().userType == "NOOB" && walletRepository.numberOfWallets(email) > 0)
+    }
+
 
 
 

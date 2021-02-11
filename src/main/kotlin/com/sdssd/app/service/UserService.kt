@@ -30,11 +30,13 @@ class UserService(val userRepo: UserRepository, val walletRepository: WalletRepo
 
     fun canAddWallet(email: String): Boolean{
 
-        return !(userRepo.findById(email).get().userType == "NOOB" && walletRepository.numberOfWallets(email) > 0)
+        return (userRepo.findById(email).get().userType == "NOOB" && walletRepository.numberOfWallets(email) > 0)
     }
 
 
-
+    fun getUserByEmail(email: String): User{
+        return userRepo.findById(email).get();
+    }
 
 
 

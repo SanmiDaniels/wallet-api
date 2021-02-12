@@ -29,7 +29,12 @@ class WalletController(val userService: UserService, val walletService: WalletSe
         return ResponseEntity<Any>("Funded", HttpStatus.OK)
     }
 
+    @PostMapping("/fund/{email}")
+    fun fundUserWallet(@RequestBody fundReq: FundRequest, @PathVariable email: String): ResponseEntity<Any>{
 
+
+        return ResponseEntity<Any>("Ok", HttpStatus.OK)
+    }
 
 
 

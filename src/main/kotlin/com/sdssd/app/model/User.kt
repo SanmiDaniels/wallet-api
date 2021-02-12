@@ -12,7 +12,6 @@ class User(
 
            val password: String,
 
-           @Pattern(regexp="^(NOOB|ELITE|ADMIN)$",message="Invalid User Type")
            val userType: String,
 
            @OneToMany(cascade = [CascadeType.ALL], mappedBy = "user",fetch = FetchType.LAZY)

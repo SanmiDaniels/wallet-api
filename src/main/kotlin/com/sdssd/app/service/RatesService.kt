@@ -1,14 +1,15 @@
 package com.sdssd.app.service
 
-import com.sdssd.app.dto.ConversionResponse
+import com.sdssd.app.dto.RatesResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.util.*
 
 @Service
-class ConversionApiService{
+class RatesService{
 
 
     @Autowired
@@ -20,10 +21,10 @@ class ConversionApiService{
     @Value("\${fixer.api-key}")
     lateinit var apiKey: String;
 
-    fun convert(fromCurrency: Currency?, toCurrency: Currency?, amount: Float?): ConversionResponse? {
+    @Bean
+    fun convert(): RatesResponse? {
     return restTemplate.getForObject(
-                apiUrl+ "convert?access_key="+apiKey+"&from="+fromCurrency?.currencyCode+"&to="
-                        +toCurrency?.currencyCode+"&amount="+ amount, ConversionResponse::class.java)
+                apiUrl+ "latest?access_key="+apiKey+"&symbols=GBP,USD,EUR,NGN,GHS", RatesResponse::class.java)
     }
 
 }

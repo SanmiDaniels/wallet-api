@@ -1,6 +1,7 @@
 package com.sdssd.app.service
 
 import com.sdssd.app.dto.FundRequest
+import com.sdssd.app.dto.RatesResponse
 import com.sdssd.app.dto.WalletDto
 import com.sdssd.app.repository.UserRepository
 import com.sdssd.app.repository.WalletRepository
@@ -15,7 +16,7 @@ import java.util.*
 @Service
 @Transactional
 class WalletService(val walletRepository: WalletRepository,
-                    val userService: UserService, val conversionApiService: ConversionApiService) {
+                    val userService: UserService, val ratesResponse: RatesResponse) {
 
 
     fun createWallet(walletDto: WalletDto, email: String): Any {
@@ -30,9 +31,9 @@ class WalletService(val walletRepository: WalletRepository,
         val userToBeFunded =  userService.getUserByEmail(useremail);
 
         if (userToBeFunded.userType == "NOOB"){
-          var conversionResponse =   conversionApiService.convert(fromCurrency = userToBeFunded.wallets.elementAt(0).currency,
-                    toCurrency = Currency.getInstance(fundReq.currency),amount = fundReq.amount )
-            print(conversionResponse.toString())
+
+            var convertedAmount: Float = (fundReq.amount / ratesResponse.rates.getCurrencyRate(fundReq.currency))*(ratesResponse.rates.getCurrencyRate(userToBeFunded.wallets.elementAt(0).currency?.currencyCode!!))
+
         }
 
     }

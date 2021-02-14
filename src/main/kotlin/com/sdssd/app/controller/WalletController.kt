@@ -2,12 +2,14 @@ package com.sdssd.app.controller
 
 import com.sdssd.app.dto.FundRequest
 import com.sdssd.app.dto.WalletDto
+import com.sdssd.app.dto.WithdrawalRequest
 import com.sdssd.app.service.UserService
 import com.sdssd.app.service.WalletService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/wallet")
@@ -24,19 +26,28 @@ class WalletController(val userService: UserService, val walletService: WalletSe
     fun fundWallet(@RequestBody fundReq: FundRequest): ResponseEntity<Any> {
 
         var useremail = SecurityContextHolder.getContext().getAuthentication().getName();
-        walletService.fundUser(useremail, fundReq);
+        walletService.fundUser(toUserEmail = useremail, fundReq =  fundReq);
 
         return ResponseEntity<Any>("Funded", HttpStatus.OK)
     }
 
     @PostMapping("/fund/{email}")
-    fun fundUserWallet(@RequestBody fundReq: FundRequest, @PathVariable email: String): ResponseEntity<Any>{
+    fun fundUserWallet(@RequestBody @Valid fundReq: FundRequest, @PathVariable email: String): ResponseEntity<Any>{
 
+        var useremail = SecurityContextHolder.getContext().getAuthentication().getName();
+        walletService.fundUser(toUserEmail = email, fundReq =  fundReq,fromUserEmail = useremail);
 
-        return ResponseEntity<Any>("Ok", HttpStatus.OK)
+        return ResponseEntity<Any>("Transaction waiting for approval", HttpStatus.ACCEPTED)
     }
 
+    @PostMapping("/withdraw")
+    fun widthdrawFromWallet(@RequestBody @Valid withdraw: WithdrawalRequest):ResponseEntity<Any>{
 
+        var useremail = SecurityContextHolder.getContext().getAuthentication().getName();
+        walletService.withdrawAmount(withdraw, useremail);
+
+        return ResponseEntity<Any>("Transaction waiting for approval", HttpStatus.ACCEPTED)
+    }
 
 
 

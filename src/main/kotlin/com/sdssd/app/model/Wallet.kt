@@ -20,6 +20,9 @@ class Wallet {
         var balance: BigInteger? = BigInteger.valueOf(0)
         var isMain = false
 
+        @OneToOne(mappedBy = "wallet", fetch = FetchType.LAZY)
+        var transaction: Transaction? = null
+
         constructor() {}
         constructor(currency: Currency?, main: Boolean) {
                 this.currency = currency

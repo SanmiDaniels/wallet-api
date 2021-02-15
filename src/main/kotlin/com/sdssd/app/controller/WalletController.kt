@@ -26,9 +26,11 @@ class WalletController(val userService: UserService, val walletService: WalletSe
     fun fundWallet(@RequestBody fundReq: FundRequest): ResponseEntity<Any> {
 
         var useremail = SecurityContextHolder.getContext().getAuthentication().getName();
-        walletService.fundUser(toUserEmail = useremail, fundReq =  fundReq);
 
-        return ResponseEntity<Any>("Funded", HttpStatus.OK)
+        return if (walletService.fundUser(toUserEmail = useremail, fundReq =  fundReq)){
+            ResponseEntity<Any>("Funded", HttpStatus.ACCEPTED)
+        }else ResponseEntity<Any>("Transaction failed", HttpStatus.NOT_ACCEPTABLE)
+
     }
 
     @PostMapping("/fund/{email}")

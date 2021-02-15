@@ -12,10 +12,15 @@ class Transaction(
         @GeneratedValue(strategy = GenerationType.AUTO)
         var id: UUID? = null,
 
-        @OneToOne(fetch = FetchType.LAZY, optional = false)
-        @MapsId
-        @JoinColumn(name = "id", referencedColumnName = "id")
-        var wallet: Wallet? = null,
+        @ManyToOne
+        @JsonIgnore
+        @JoinColumn(name = "onWallet_id")
+        var toWallet: Wallet? = null,
+
+        @ManyToOne
+        @JsonIgnore
+        @JoinColumn(name = "byWallet_id")
+        var fromWallet: Wallet? = null,
 
         @Pattern(regexp = "^(FUNDING|WITHDRAWAL)$", message = "Invalid Transaction Type")
         var transactionType: String? = null,
@@ -32,7 +37,7 @@ class Transaction(
         @JoinColumn(name = "initiated_on")
         var initiatedOn: User? = null,
 
-        var approved: Boolean? = false
+        var approved: Boolean? = false,
 
 ){
 

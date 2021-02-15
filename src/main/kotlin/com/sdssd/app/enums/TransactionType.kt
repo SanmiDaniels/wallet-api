@@ -1,5 +1,5 @@
 package com.sdssd.app.enums
 
 enum class TransactionType {
-   FUND, WITHDRAW
+   FUND, WITHDRAW, TRANSFER
 }

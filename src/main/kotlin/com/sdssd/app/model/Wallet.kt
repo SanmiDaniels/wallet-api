@@ -20,8 +20,11 @@ class Wallet {
         var balance: BigInteger? = BigInteger.valueOf(0)
         var isMain = false
 
-        @OneToOne(mappedBy = "wallet", fetch = FetchType.LAZY)
-        var transaction: Transaction? = null
+        @OneToMany(cascade = [CascadeType.ALL], mappedBy = "toWallet",fetch = FetchType.LAZY)
+        var toTransactions: MutableSet<Transaction> = HashSet()
+
+        @OneToMany(cascade = [CascadeType.ALL], mappedBy = "fromWallet",fetch = FetchType.LAZY)
+        var fromTransactions: MutableSet<Transaction> = HashSet()
 
         constructor() {}
         constructor(currency: Currency?, main: Boolean) {

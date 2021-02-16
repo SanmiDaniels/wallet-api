@@ -14,12 +14,12 @@ class Transaction(
 
         @ManyToOne
         @JsonIgnore
-        @JoinColumn(name = "onWallet_id")
+        @JoinColumn(name = "toWallet_id")
         var toWallet: Wallet? = null,
 
         @ManyToOne
         @JsonIgnore
-        @JoinColumn(name = "byWallet_id")
+        @JoinColumn(name = "fromWallet_id")
         var fromWallet: Wallet? = null,
 
         @Pattern(regexp = "^(FUNDING|WITHDRAWAL)$", message = "Invalid Transaction Type")

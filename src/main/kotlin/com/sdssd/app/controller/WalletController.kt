@@ -17,8 +17,8 @@ class WalletController(val userService: UserService, val walletService: WalletSe
 
     @PostMapping("/create/{email}")
     fun createWalletForUser(@PathVariable email:String, @RequestBody wallet: WalletDto): ResponseEntity<Any> {
-        return if(userService.canAddWallet(email))
-            ResponseEntity<Any>("User cannot create more than one wallet", HttpStatus.FORBIDDEN);
+        return if(userService.canAddWallet(email, wallet))
+            ResponseEntity<Any>("User cannot create wallet", HttpStatus.FORBIDDEN);
         else ResponseEntity<Any>(walletService.createWallet(wallet, email), HttpStatus.OK);
     }
 
@@ -46,9 +46,8 @@ class WalletController(val userService: UserService, val walletService: WalletSe
     fun widthdrawFromWallet(@RequestBody @Valid withdraw: WithdrawalRequest):ResponseEntity<Any>{
 
         var useremail = SecurityContextHolder.getContext().getAuthentication().getName();
-        walletService.withdrawAmount(withdraw, useremail);
 
-        return ResponseEntity<Any>("Transaction waiting for approval", HttpStatus.ACCEPTED)
+        return ResponseEntity<Any>(walletService.withdrawAmount(withdraw, useremail), HttpStatus.ACCEPTED)
     }
 
 

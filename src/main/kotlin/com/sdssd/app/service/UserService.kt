@@ -1,7 +1,10 @@
 package com.sdssd.app.service
 
 import com.sdssd.app.dto.UserDto
+import com.sdssd.app.dto.WalletDto
+import com.sdssd.app.enums.UserType
 import com.sdssd.app.model.User
+import com.sdssd.app.model.Wallet
 import com.sdssd.app.repository.UserRepository
 import com.sdssd.app.repository.WalletRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -30,11 +33,15 @@ class UserService(val userRepo: UserRepository, val walletRepository: WalletRepo
     }
 
 
-    fun canAddWallet(email: String): Boolean{
+    fun canAddWallet(email: String, walletDto: WalletDto?): Boolean{
 
-        if(userRepo.findById(email).get().userType == "ADMIN") return false;
+        if(userRepo.findById(email).get().userType == UserType.ADMIN.name) return false;
 
-        return (userRepo.findById(email).get().userType == "NOOB" && walletRepository.numberOfWallets(email) > 0)
+        //Checks if user hasa a wallet with that same currency returns if so
+        val walletWithSameCurrency = userRepo.findById(email).get().wallets.find{wallet -> ( wallet.currency == Currency.getInstance(walletDto?.currencyCode)) }
+        walletWithSameCurrency?.let { return true }
+
+        return (userRepo.findById(email).get().userType == UserType.NOOB.name && walletRepository.numberOfWallets(email) > 0)
     }
 
 

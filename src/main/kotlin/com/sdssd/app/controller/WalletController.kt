@@ -37,17 +37,18 @@ class WalletController(val userService: UserService, val walletService: WalletSe
     fun fundUserWallet(@RequestBody @Valid fundReq: FundRequest, @PathVariable email: String): ResponseEntity<Any>{
 
         var useremail = SecurityContextHolder.getContext().getAuthentication().getName();
-        walletService.fundUser(toUserEmail = email, fundReq =  fundReq,fromUserEmail = useremail);
+        val response = walletService.fundUser(toUserEmail = email, fundReq =  fundReq,fromUserEmail = useremail);
 
-        return ResponseEntity<Any>("Transaction waiting for approval", HttpStatus.ACCEPTED)
+        return ResponseEntity<Any>(response, HttpStatus.ACCEPTED)
     }
 
     @PostMapping("/withdraw")
     fun widthdrawFromWallet(@RequestBody @Valid withdraw: WithdrawalRequest):ResponseEntity<Any>{
 
         var useremail = SecurityContextHolder.getContext().getAuthentication().getName();
+        val response = walletService.withdrawAmount(withdraw, useremail);
 
-        return ResponseEntity<Any>(walletService.withdrawAmount(withdraw, useremail), HttpStatus.ACCEPTED)
+        return ResponseEntity<Any>(response, HttpStatus.ACCEPTED)
     }
 
 

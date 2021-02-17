@@ -1,6 +1,7 @@
 package com.sdssd.app.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.sdssd.app.dto.TransactionDto
 import java.util.*
 import javax.persistence.*
 import javax.validation.constraints.Pattern
@@ -41,5 +42,8 @@ class Transaction(
 
 ){
 
+        fun toDto(): TransactionDto{
+                return TransactionDto(this.id,this.transactionType, fromWallet?.id, toWallet?.id, this.approved, this.amount  )
+        }
 
 }

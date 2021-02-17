@@ -45,8 +45,8 @@ class UserService(val userRepo: UserRepository, val walletRepository: WalletRepo
     }
 
 
-    fun getUserByEmail(email: String): User{
-        return userRepo.findById(email).get();
+    fun getUserByEmail(email: String): Optional<User> {
+        return userRepo.findById(email);
     }
 
 

@@ -10,7 +10,7 @@ class TransactionDto(
         val fromWalletId: UUID? =  null,
         val toWalletId: UUID? = null,
         val approved: Boolean?,
-        val amount: Float?
+        val amount: Double?
 
         ) {
 }

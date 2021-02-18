@@ -20,7 +20,7 @@ import java.util.*
 @Service
 @Transactional
 class UserService(val userRepo: UserRepository, val walletRepository: WalletRepository,
-                  val passwordEncoder: PasswordEncoder) : UserDetailsService {
+                  val passwordEncoder: PasswordEncoder, val transactionService: TransactionService) : UserDetailsService {
 
 
     fun createUser(newUser: UserDto) : Boolean{
@@ -49,7 +49,9 @@ class UserService(val userRepo: UserRepository, val walletRepository: WalletRepo
         return userRepo.findById(email);
     }
 
-
+    fun saveUser(user: User){
+        userRepo.save(user);
+    }
 
     override fun loadUserByUsername(email: String): UserDetails {
         val user: Optional<User> = userRepo.findById(email);

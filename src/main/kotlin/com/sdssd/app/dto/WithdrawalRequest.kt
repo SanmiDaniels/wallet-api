@@ -6,6 +6,6 @@ class WithdrawalRequest (
 
         @Pattern(regexp = "^(GBP|USD|EUR|NGN|GHS)$", message = "This currency is not supported")
         val currency: String,
-        val amount: Float
+        val amount: Double
         ){
 }

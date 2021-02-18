@@ -26,7 +26,7 @@ class Transaction(
         @Pattern(regexp = "^(FUNDING|WITHDRAWAL)$", message = "Invalid Transaction Type")
         var transactionType: String? = null,
 
-        var amount: Float? = null,
+        var amount: Double? = null,
 
         @ManyToOne
         @JsonIgnore

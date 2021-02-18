@@ -1,6 +1,7 @@
 package com.sdssd.app.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.GenericGenerator
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import javax.persistence.*
@@ -17,7 +18,7 @@ class Wallet {
         @JoinColumn(name = "user_email")
         var user: User? = null
         var currency: Currency? = null
-        var balance: BigInteger? = BigInteger.valueOf(0)
+        var balance: BigDecimal? = BigDecimal.valueOf(0)
         var isMain = false
 
         @OneToMany(cascade = [CascadeType.ALL], mappedBy = "toWallet",fetch = FetchType.LAZY)

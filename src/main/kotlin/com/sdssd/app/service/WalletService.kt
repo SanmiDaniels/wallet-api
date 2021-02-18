@@ -65,7 +65,7 @@ class WalletService(val walletRepository: WalletRepository, val transactionServi
     }
 
     fun fundNoobUser(userToBeFunded: User, fromUser: User?, fromWallet: List<Wallet>?, fundReq: FundRequest): TransactionDto {
-        var convertedAmount: Float = (fundReq.amount / ratesResponse.rates.getCurrencyRate(fundReq.currency))*(ratesResponse.rates.getCurrencyRate(userToBeFunded.wallets.elementAt(0).currency?.currencyCode!!))
+        var convertedAmount: Double = ((fundReq.amount / ratesResponse.rates.getCurrencyRate(fundReq.currency))*(ratesResponse.rates.getCurrencyRate(userToBeFunded.wallets.elementAt(0).currency?.currencyCode!!))).toDouble()
         return transactionService.saveTransaction(
                     Transaction(toWallet = userToBeFunded.wallets.elementAt(0),
                             transactionType = fromUser?.let { TransactionType.TRANSFER.name } ?: TransactionType.FUND.name,
@@ -76,56 +76,60 @@ class WalletService(val walletRepository: WalletRepository, val transactionServi
     fun fundEliteUser(userToBeFunded: User, fromUser: User?, fromWallet: List<Wallet>?, fundReq: FundRequest): TransactionDto {
 
         val walletWithSameCurrency = userToBeFunded.wallets.find{wallet -> ( wallet.currency == Currency.getInstance(fundReq.currency)) }
+        var transaction = Transaction()
+
         walletWithSameCurrency?.let {
-            return transactionService.saveTransaction(
-                        Transaction(toWallet = it,
-                                transactionType = fromUser?.let { TransactionType.TRANSFER.name } ?: TransactionType.FUND.name,
-                                amount = fundReq.amount, initiatedOn = userToBeFunded, fromWallet = fromWallet?.elementAt(0),
-                                initiatedBy = fromUser?.let { fromUser } ?: userToBeFunded)).toDto() } ?: run {
+            transaction =  transactionService.saveTransaction(
+                                Transaction(toWallet = it,
+                                        transactionType = fromUser?.let { TransactionType.TRANSFER.name } ?: TransactionType.FUND.name,
+                                        amount = fundReq.amount, initiatedOn = userToBeFunded, fromWallet = fromWallet?.elementAt(0),
+                                        initiatedBy = fromUser?.let { fromUser } ?: userToBeFunded)) } ?: run {
 
-                    val newWallet = Wallet(currency = Currency.getInstance(fundReq.currency), main = false)
-                    newWallet.user = userToBeFunded
+        val newWallet = Wallet(currency = Currency.getInstance(fundReq.currency), main = false)
+        newWallet.user = userToBeFunded
 
-            return transactionService.saveTransaction(
-                    Transaction(toWallet = walletRepository.save(newWallet),
-                            transactionType = fromUser?.let { TransactionType.TRANSFER.name }
-                                    ?: TransactionType.FUND.name,
-                            amount = fundReq.amount, initiatedOn = userToBeFunded, fromWallet = fromWallet?.elementAt(0),
-                            initiatedBy = fromUser?.let { fromUser } ?: userToBeFunded)).toDto()
+            transaction =  transactionService.saveTransaction(
+                                Transaction(toWallet = walletRepository.save(newWallet),
+                                        transactionType = fromUser?.let { TransactionType.TRANSFER.name }
+                                                ?: TransactionType.FUND.name,
+                                        amount = fundReq.amount, initiatedOn = userToBeFunded, fromWallet = fromWallet?.elementAt(0),
+                                        initiatedBy = fromUser?.let { fromUser } ?: userToBeFunded))
         }
 
-
-
+        transactionService.makeTransaction(transaction);
+        return transaction.toDto()
     }
 
 
     fun withdrawFromNoobUser(user: User, withdraw: WithdrawalRequest): Any{
 
-        var convertedAmount: Float = (withdraw.amount / ratesResponse.rates.getCurrencyRate(withdraw.currency))*(ratesResponse.rates.getCurrencyRate(user.wallets.elementAt(0).currency?.currencyCode!!))
+        var convertedAmount: Double = (withdraw.amount / ratesResponse.rates.getCurrencyRate(withdraw.currency))*(ratesResponse.rates.getCurrencyRate(user.wallets.elementAt(0).currency?.currencyCode!!))
 
         return transactionService.saveTransaction(
                 Transaction(fromWallet = user.wallets.elementAt(0), transactionType = TransactionType.WITHDRAW.name,
                         amount = convertedAmount, initiatedOn = user, initiatedBy = user)).toDto()
-
 
     }
 
     fun withdrawFromEliteUser(user: User, withdraw: WithdrawalRequest): Any{
 
         val walletWithSameCurrency = user.wallets.find{wallet -> ( wallet.currency == Currency.getInstance(withdraw.currency)) }
+        var transaction = Transaction()
 
         walletWithSameCurrency?.let {
-            return transactionService.saveTransaction(
-                Transaction(fromWallet = walletWithSameCurrency, transactionType = TransactionType.WITHDRAW.name,
-                        amount = withdraw.amount, initiatedOn = user, initiatedBy = user)).toDto() } ?: run {
+            transaction =  transactionService.saveTransaction(
+                            Transaction(fromWallet = walletWithSameCurrency, transactionType = TransactionType.WITHDRAW.name,
+                                    amount = withdraw.amount, initiatedOn = user, initiatedBy = user)) } ?: run {
 
-        var mainWallet = user.wallets.find{wallet -> ( wallet.isMain)};
-        var convertedAmount: Float = (withdraw.amount / ratesResponse.rates.getCurrencyRate(withdraw.currency))*(ratesResponse.rates.getCurrencyRate(mainWallet?.currency?.currencyCode!!))
-            return transactionService.saveTransaction(
-                    Transaction(fromWallet = mainWallet, transactionType = TransactionType.WITHDRAW.name,
-                            amount = convertedAmount, initiatedOn = user, initiatedBy = user)).toDto()
+        val mainWallet = user.wallets.find{ wallet -> ( wallet.isMain)};
+        val convertedAmount: Double = (withdraw.amount / ratesResponse.rates.getCurrencyRate(withdraw.currency))*(ratesResponse.rates.getCurrencyRate(mainWallet?.currency?.currencyCode!!))
+            transaction =  transactionService.saveTransaction(
+                            Transaction(fromWallet = mainWallet, transactionType = TransactionType.WITHDRAW.name,
+                                    amount = convertedAmount, initiatedOn = user, initiatedBy = user))
         }
 
+        transactionService.makeTransaction(transaction);
+        return transaction.toDto();
     }
 
 

@@ -22,6 +22,10 @@ class WalletService(val walletRepository: WalletRepository, val transactionServi
       return walletRepository.findById(walletId);
     }
 
+    fun getAllWalltes(): List<Wallet>{
+        return walletRepository.findAll();
+    }
+
     fun createWallet(walletDto: WalletDto, email: String): Any {
         val wallet = walletDto.toWallet()
         val user = userService.getUserByEmail(email)
@@ -73,31 +77,28 @@ class WalletService(val walletRepository: WalletRepository, val transactionServi
                             initiatedBy = fromUser?.let { it } ?: userToBeFunded)).toDto()
     }
 
-    fun fundEliteUser(userToBeFunded: User, fromUser: User?, fromWallet: List<Wallet>?, fundReq: FundRequest): TransactionDto {
+    fun fundEliteUser(userToBeFunded: User, fromUser: User?, fromWallet: List<Wallet>?, fundReq: FundRequest): TransactionDto? {
 
         val walletWithSameCurrency = userToBeFunded.wallets.find{wallet -> ( wallet.currency == Currency.getInstance(fundReq.currency)) }
-        var transaction = Transaction()
 
         walletWithSameCurrency?.let {
-            transaction =  transactionService.saveTransaction(
+           return transactionService.makeTransaction(
                                 Transaction(toWallet = it,
                                         transactionType = fromUser?.let { TransactionType.TRANSFER.name } ?: TransactionType.FUND.name,
                                         amount = fundReq.amount, initiatedOn = userToBeFunded, fromWallet = fromWallet?.elementAt(0),
-                                        initiatedBy = fromUser?.let { fromUser } ?: userToBeFunded)) } ?: run {
+                                        initiatedBy = fromUser?.let { fromUser } ?: userToBeFunded))?.toDto() } ?: run {
 
         val newWallet = Wallet(currency = Currency.getInstance(fundReq.currency), main = false)
         newWallet.user = userToBeFunded
 
-            transaction =  transactionService.saveTransaction(
+            return transactionService.makeTransaction(
                                 Transaction(toWallet = walletRepository.save(newWallet),
                                         transactionType = fromUser?.let { TransactionType.TRANSFER.name }
                                                 ?: TransactionType.FUND.name,
                                         amount = fundReq.amount, initiatedOn = userToBeFunded, fromWallet = fromWallet?.elementAt(0),
-                                        initiatedBy = fromUser?.let { fromUser } ?: userToBeFunded))
+                                        initiatedBy = fromUser?.let { fromUser } ?: userToBeFunded))?.toDto()
         }
 
-        transactionService.makeTransaction(transaction);
-        return transaction.toDto()
     }
 
 

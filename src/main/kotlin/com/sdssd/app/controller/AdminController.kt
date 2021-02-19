@@ -2,17 +2,17 @@ package com.sdssd.app.controller
 
 
 import com.sdssd.app.service.AdminService
+import com.sdssd.app.service.TransactionService
+import com.sdssd.app.service.WalletService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("/admin")
-class AdminController(val adminService: AdminService) {
+class AdminController(val adminService: AdminService,val walletService: WalletService,
+                      val transactionService: TransactionService) {
 
     @PostMapping("/change-main-wallet")
     fun changeMainWallet(@RequestParam useremail: String, @RequestParam toWalletId: UUID): ResponseEntity<Any> {
@@ -44,9 +44,15 @@ class AdminController(val adminService: AdminService) {
         return ResponseEntity<Any>("Successful", HttpStatus.OK)
     }
 
+    @GetMapping("/get-transactions")
+    fun getTransactions(): ResponseEntity<Any> {
+        return ResponseEntity<Any>(transactionService.getTransactions(), HttpStatus.OK)
+    }
 
-
-
+    @GetMapping("/get-wallets")
+    fun getWalletss(): ResponseEntity<Any> {
+        return ResponseEntity<Any>(walletService.getAllWalltes(), HttpStatus.OK)
+    }
 
 
 }

@@ -35,19 +35,7 @@ class AdminService(val walletService: WalletService, val userService: UserServic
     fun approveTransaction(transactionId: UUID){
        val transaction =  transactionService.getTransaction(transactionId);
 
-        if (transaction.approved!!) return
-
-        if (transaction.transactionType == TransactionType.FUND.name) transactionService.creditWallet(transaction.amount!!, transaction.toWallet?.id!!)
-
-        if (transaction.transactionType == TransactionType.WITHDRAW.name) transactionService.debitWallet(transaction.amount!!, transaction.fromWallet?.id!!)
-
-        if (transaction.transactionType == TransactionType.TRANSFER.name){
-            transactionService.creditWallet(transaction.amount!!, transaction.toWallet?.id!!)
-            transactionService.debitWallet(transaction.amount!!, transaction.fromWallet?.id!!)
-        }
-
-        transaction.approved = true
-        transactionService.saveTransaction(transaction)
+        transactionService.makeTransaction(transaction)
     }
 
 
@@ -68,7 +56,10 @@ class AdminService(val walletService: WalletService, val userService: UserServic
 
         val user = userService.getUserByEmail(useremail).get();
 
-        if (user.userType == UserType.ELITE.name) user.userType = UserType.NOOB.name
+        if (user.userType == UserType.ELITE.name){
+            user.wallets.removeIf { wallet -> !wallet.isMain }
+            user.userType = UserType.NOOB.name
+        }
 
         if (user.userType == UserType.ADMIN.name) user.userType = UserType.ELITE.name;
 

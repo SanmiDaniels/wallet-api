@@ -11,6 +11,7 @@ import javax.persistence.*
 class Wallet {
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
+        @Column(columnDefinition = "BINARY(16)")
         var id: UUID? = null
 
         @ManyToOne

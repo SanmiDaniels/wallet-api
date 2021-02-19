@@ -2,6 +2,7 @@ package com.sdssd.app.service
 
 import com.sdssd.app.enums.TransactionType
 import com.sdssd.app.model.Transaction
+import com.sdssd.app.model.Wallet
 import com.sdssd.app.repository.TransactionRepository
 import com.sdssd.app.repository.WalletRepository
 import org.springframework.stereotype.Service
@@ -22,36 +23,35 @@ class TransactionService(val transactionRepository: TransactionRepository,
         return transactionRepository.getOne(transactionId)
     }
 
-    fun debitWallet(amount: Double, walletId: UUID){
 
-        var wallet = walletRepository.findById(walletId).get()
 
-        wallet.balance?.subtract(BigDecimal.valueOf(amount));
-        walletRepository.save(wallet)
+    fun makeTransaction(transaction: Transaction): Transaction? {
+        val fromWallet = transaction.fromWallet
+        val toWallet = transaction.toWallet
 
-    }
+        if (transaction.approved!!) return null;
 
-    fun creditWallet(amount: Double, walletId: UUID){
-        var wallet = walletRepository.findById(walletId).get()
+        if (transaction.transactionType == TransactionType.FUND.name){
+            toWallet?.balance = toWallet?.balance?.add(BigDecimal.valueOf(transaction.amount!!))
+        }
 
-        wallet.balance?.add(BigDecimal.valueOf(amount));
-        walletRepository.save(wallet)
-    }
-
-    fun makeTransaction(transaction: Transaction){
-        if (transaction.approved!!) return
-
-        if (transaction.transactionType == TransactionType.FUND.name) creditWallet(transaction.amount!!, transaction.toWallet?.id!!)
-
-        if (transaction.transactionType == TransactionType.WITHDRAW.name) debitWallet(transaction.amount!!, transaction.fromWallet?.id!!)
+        if (transaction.transactionType == TransactionType.WITHDRAW.name) {
+            fromWallet?.balance = fromWallet?.balance?.subtract(BigDecimal.valueOf(transaction.amount!!))
+        }
 
         if (transaction.transactionType == TransactionType.TRANSFER.name){
-            creditWallet(transaction.amount!!, transaction.toWallet?.id!!)
-            debitWallet(transaction.amount!!, transaction.fromWallet?.id!!)
+            toWallet?.balance = toWallet?.balance?.add(BigDecimal.valueOf(transaction.amount!!))
+            fromWallet?.balance = fromWallet?.balance?.subtract(BigDecimal.valueOf(transaction.amount!!))
         }
 
         transaction.approved = true
-        saveTransaction(transaction)
+        toWallet?.let { walletRepository.save(it) }
+        fromWallet?.let { walletRepository.save(it) }
+        return saveTransaction(transaction)
+    }
+
+    fun getTransactions(): List<Transaction>{
+        return transactionRepository.findAll();
     }
 
 

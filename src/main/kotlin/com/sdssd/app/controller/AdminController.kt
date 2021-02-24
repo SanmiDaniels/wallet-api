@@ -6,11 +6,13 @@ import com.sdssd.app.service.TransactionService
 import com.sdssd.app.service.WalletService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("/admin")
+@PreAuthorize("hasRole('ADMIN')")
 class AdminController(val adminService: AdminService,val walletService: WalletService,
                       val transactionService: TransactionService) {
 

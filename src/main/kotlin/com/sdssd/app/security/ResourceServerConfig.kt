@@ -18,14 +18,6 @@ import javax.servlet.http.HttpServletRequest
 @Configuration
 @EnableResourceServer
 class ResourceServerConfig : ResourceServerConfigurerAdapter() {
-    private val PERMIT_ALL_GET_REQUEST = arrayOf<String>("/user")
-    private val PERMIT_ALL_REQUEST = arrayOf<String>("/user")
-    private val PERMIT_ALL_POST_REQUEST = arrayOf<String>("/test")
-    private val PERMIT_NOOB_GET_REQUEST = arrayOf<String>("/user/test")
-    private val PERMIT_NOOB_POST_REQUEST = arrayOf<String>("/user/test")
-    private val PERMIT_ELITE_GET_REQUEST = arrayOf<String>("/user/test")
-    private val PERMIT_ELITE_POST_REQUEST = arrayOf<String>("/user/test")
-    private val PERMIT_ADMIN_REQUEST = arrayOf<String>("/user/test")
 
     @Bean
     fun encoder(): PasswordEncoder {
@@ -44,15 +36,7 @@ class ResourceServerConfig : ResourceServerConfigurerAdapter() {
             cors.allowedMethods = List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
             cors.allowedHeaders = List.of("*")
             cors
-        }.and().authorizeRequests().antMatchers(*PERMIT_ALL_REQUEST).permitAll()
-                .antMatchers(HttpMethod.GET, *PERMIT_ALL_GET_REQUEST).permitAll()
-                .antMatchers(HttpMethod.POST, *PERMIT_ALL_POST_REQUEST).permitAll()
-                .antMatchers(HttpMethod.GET, *PERMIT_NOOB_GET_REQUEST).access("hasRole('NOOB')")
-                .antMatchers(HttpMethod.POST, *PERMIT_NOOB_POST_REQUEST).access("hasRole('NOOB')")
-                .antMatchers(HttpMethod.GET, *PERMIT_ELITE_GET_REQUEST).access("hasRole('ELITE')")
-                .antMatchers(HttpMethod.PUT, *PERMIT_ELITE_POST_REQUEST).access("hasRole('ELITE')")
-                .antMatchers(*PERMIT_ADMIN_REQUEST).access("hasRole('ADMIN')").and().exceptionHandling()
-                .accessDeniedHandler(OAuth2AccessDeniedHandler())
+        }.and().exceptionHandling().accessDeniedHandler(OAuth2AccessDeniedHandler())
     }
 
 }

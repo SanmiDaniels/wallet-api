@@ -7,6 +7,7 @@ import com.sdssd.app.service.UserService
 import com.sdssd.app.service.WalletService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -23,6 +24,7 @@ class WalletController(val userService: UserService, val walletService: WalletSe
     }
 
     @PostMapping("/fund")
+    @PreAuthorize("hasAnyRole('NOOB', 'ELITE')")
     fun fundWallet(@RequestBody fundReq: FundRequest): ResponseEntity<Any> {
 
         var useremail = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -34,6 +36,7 @@ class WalletController(val userService: UserService, val walletService: WalletSe
     }
 
     @PostMapping("/fund/{email}")
+    @PreAuthorize("hasAnyRole('NOOB', 'ELITE')")
     fun fundUserWallet(@RequestBody @Valid fundReq: FundRequest, @PathVariable email: String): ResponseEntity<Any>{
 
         var useremail = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -43,6 +46,7 @@ class WalletController(val userService: UserService, val walletService: WalletSe
     }
 
     @PostMapping("/withdraw")
+    @PreAuthorize("hasAnyRole('NOOB', 'ELITE')")
     fun widthdrawFromWallet(@RequestBody @Valid withdraw: WithdrawalRequest):ResponseEntity<Any>{
 
         var useremail = SecurityContextHolder.getContext().getAuthentication().getName();

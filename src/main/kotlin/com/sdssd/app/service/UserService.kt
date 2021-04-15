@@ -67,4 +67,11 @@ class UserService(val userRepo: UserRepository, val walletRepository: WalletRepo
         return Arrays.asList(SimpleGrantedAuthority("ROLE_$auth"))
     }
 
+    fun walletBelongsToUser(useremail: String, walletId: UUID): Boolean {
+
+        val user: Optional<User> = userRepo.findById(useremail);
+        val wallet : Wallet? = user.get().wallets.find { wallet -> wallet.id == walletId }
+        return wallet != null;
+    }
+
 }

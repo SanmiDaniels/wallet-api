@@ -39,6 +39,7 @@ class ResourceServerConfig : ResourceServerConfigurerAdapter() {
             cors.allowedHeaders = List.of("*")
             cors
         }.and().exceptionHandling().accessDeniedHandler(OAuth2AccessDeniedHandler())
+        // Expression based access control takes care of authorisation
         .and().authorizeRequests().anyRequest().permitAll();
     }
 
